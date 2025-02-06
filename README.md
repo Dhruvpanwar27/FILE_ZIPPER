@@ -4,39 +4,103 @@ This project is based on Huffman Coding, a lossless, bottom-up compression algor
 To learn more about Huffman Coding and its applications in Information Theory read this article.
 
 Implementation in Project
-This project supports two functions:
-1) Encode: Compresses input file passed.
-2) Decode: Decompresses Huffman coded file passed back to its original file.
+Huffman coding is a lossless data compression algorithm that assigns variable-length codes to input characters, with shorter codes assigned to more frequent characters. The main goal of your project is to compress and decompress files using Huffman coding.
 
-struct Node represents a node of Huffman Tree which is generated during compression or decompression of files. It stores character data, its frequency, Huffman code, and two pointers that point towards the left or right node if they exist.
+## Project Breakdown:
 
-Huffman class contains only two public functions
-1) compress()
-2) decompress()
-And a constructor which accepts input file and output file. The object of this class can be initiated as follows: huffman h(inputFileName, outputFileName);
+## Step 1: Compression (encode.cpp):
 
-Compressing file compress(): Following are the steps followed to compress the input file.
+`Input` : The program takes two arguments: an input file (argv[1]) and an output file (argv[2]).
 
-1)createMinHeap(): This function reads the input file and stores the frequency of all the characters appearing in the file. It further creates a Min Heap structure based on the frequency of each character using priority queue as a data structure that stores Nodes and uses its frequency as a comparing parameter.
+## Create Frequency Table:
 
-2)createTree(): This function generates the Huffman tree by duplicating the Min Heap created earlier keeping the original Min Heap. It pops the two Nodes with the lowest frequency. Further, it assigns these two as left and right nodes to a new Node with a frequency which is the sum of the two popped nodes and pushes this Node back to the Min Heap. This process is continued until Min Heap has a size equal to 1.
+The huffman class is initialized with the input and output filenames.
 
-3)createCodes(): This function traverses the entire Huffman tree and assigns codes in binary format to every Node.
+The `createArr()` method initializes an array of Node objects to store frequency information for each character.
 
-4)saveEncodedFile(): This function saves the Huffman encoded input file to the output file. The image below illustrates how the output file is written.
+`createMinHeap()` reads the input file and counts the frequency of each character, storing it in a priority queue (min-heap).
 
-minHeap = ({character data} {huffman code for that character}) * minheapsize
+## Build Huffman Tree:
 
-{huffman code for that character} = 128 bits divided into 16 decimal numbers. Every number represents 8 bit binary number.
-eg: {127 - code.length()} * '0' + '1' (representing start bit) + code = 128 bits
-It is converted to 16 * 8-bit decimal numbers = 128 bits
+`createTree()` builds the Huffman tree by combining nodes based on their frequency.
 
-{Encoded input File characters} {count0} = Entire file is converted into its huffman encoded form which is a binary code. This binary string is divided in 8-bit decimal numbers. If the final remaining bits are less than 8 bits, (8 - remainingBits) number of '0's are appended at the end. count0 is the number of '0's appended at the end.
+The tree is then traversed, and the createCodes() method assigns a binary code to each character in the tree.
 
-The output file should be (.huf) file which represents it is a Huffman encoded file.
+## Encoding:
 
-Decompressing file decompress(): Following are the steps followed to decompress the Huffman encoded file.
+The `saveEncodedFile()` method generates the encoded file, which includes:
 
-1)getTree(): This function reads the Min Heap stored at the beginning of the file and reconstructs the Huffman tree by appending one Node at a time. MinHeapSize is the first value, next {MinHeapSize * (1+16)} contains character data and 16 decimal values representing 128 bits of binary Huffman code. Ignore the initial (127 - code.length()) of '0's and starting '1' bit and append the Node.
+The Huffman tree’s structure (meta-data).
 
-2)saveDecodedFile(): This function reads the entire {Encoded input File charachters} and {count0} by ignoring the first {MinHeapSize * (1 + 16)} of the file. The decimal values are converted to their binary equivalent(huffman codes) and the resulting character is appended to the output file by traversing the reconstructed huffman tree. The final count0 number of '0's are ignored since they were extra bits added while saving the encoded file.
+The binary codes for characters in the input file.
+
+The encoded output is saved as a binary file, which is compressed.
+
+## Step 2: Decompression (decode.cpp):
+
+`Input` : The program takes the encoded file and a destination file to save the decompressed data.
+
+## Rebuild Huffman Tree:
+
+`getTree()` reconstructs the Huffman tree from the meta-data stored in the encoded file.
+
+## Decoding:
+
+The `saveDecodedFile()` method reads the binary data from the encoded file.
+
+Using the reconstructed Huffman tree, it decodes the binary stream back into the original characters and writes the result to the output file.
+
+## Huffman Class Methods Overview:
+`createArr()` : Initializes an array of Node objects (one for each ASCII character, initialized with a frequency of 0).
+
+`createMinHeap()` : Reads the input file to count the frequency of each character and pushes them into a priority queue (min-heap).
+
+`createTree()` : Builds the Huffman tree by repeatedly merging the two least frequent nodes in the heap until only one node (the root) remains.
+
+`createCodes()` : Traverses the Huffman tree and assigns binary codes to each character.
+
+`saveEncodedFile()` : Writes the encoded file, including the meta-data (Huffman tree) and the encoded data.
+
+`saveDecodedFile()` : Reads the encoded file, reconstructs the Huffman tree, and decodes the binary data back to its original form.
+
+
+## Program Flow:
+
+When you run encode.cpp, the program reads the input file, compresses it using Huffman coding, and saves the result in an encoded file.
+
+When you run decode.cpp, the program takes the encoded file, reconstructs the Huffman tree, and writes the decompressed original content to a new file.
+
+
+
+## How to run this project
+
+## Compile the Code
+
+Run these command in the terminal :
+
+`g++ -o encode encode.cpp huffman.cpp`
+
+`g++ -o decode decode.cpp huffman.cpp`
+
+This will create two executable files.
+
+encode (for compression)
+
+decode (for decompression)
+
+## Run Compression (Encoding)
+
+If your input file is named `inputFile.txt`, run:
+
+`./encode inputFile.txt encoded.huf`
+
+This will compress `inputFile.txt` into `encoded.huf`.
+
+The compressed data will be saved in `encoded.huf`.
+
+## Run Decompression (Decoding)
+
+To decompress `encoded.huf` back into a readable file `(e.g., outputFile.txt)` , run:
+
+`./decode encoded.huf outputFile.txt`
+
